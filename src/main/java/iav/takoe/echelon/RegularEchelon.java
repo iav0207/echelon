@@ -61,8 +61,7 @@ class RegularEchelon<V> implements Echelon<V> {
             next.switchValue();
             return;
         }
-        checkState(canSwitchLocal(), "switchValue() called while canSwitch() == false");
-        pollValue();
+        switchLocalValue();
         if (next != null) {
             next.renew();
         }
@@ -70,14 +69,14 @@ class RegularEchelon<V> implements Echelon<V> {
 
     void renew() {
         scope = new ArrayDeque<>(scopeFunction.get());
-        pollValue();
+        switchLocalValue();
         if (next != null) {
             next.renew();
         }
     }
 
-    void pollValue() {
-        checkState(canSwitchLocal(), "attempt to poll value when none left");
+    void switchLocalValue() {
+        checkState(canSwitchLocal(), "attempt to switch value when none left in the scope");
         value = scope.remove();
     }
 
