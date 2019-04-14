@@ -1,7 +1,6 @@
 package iav.takoe.echelon;
 
 import com.google.common.collect.Lists;
-import iav.takoe.echelon.Echelon.ScopeFunction;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ class RegularEchelonTest {
     @BeforeEach
     void init() {
         result = EchelonBuilder.<Integer>regular()
-                .createBatch(CHAIN_LENGTH, ScopeFunction.sequence(SCOPE))
+                .createBatch(CHAIN_LENGTH, Range.fixed(SCOPE))
                 .getHead()
                 .stream()
                 .collect(toList());

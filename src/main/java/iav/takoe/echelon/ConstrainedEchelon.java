@@ -9,14 +9,14 @@ class ConstrainedEchelon<V> extends RegularEchelon<V> {
 
     private final GlobalConstraint<V> constraint;
 
-    ConstrainedEchelon(GlobalConstraint<V> constraint, ScopeFunction<V> scopeFunction) {
-        super(scopeFunction);
+    ConstrainedEchelon(GlobalConstraint<V> constraint, Range<V> range) {
+        super(range);
         this.constraint = constraint;
         constraint.register(this);
     }
 
     @Override
-    public RegularEchelon<V> createNext(ScopeFunction<V> scopeGenerator) {
+    public RegularEchelon<V> createNext(Range<V> scopeGenerator) {
         return setNext(new ConstrainedEchelon<>(constraint, scopeGenerator));
     }
 

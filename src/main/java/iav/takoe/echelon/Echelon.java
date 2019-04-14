@@ -1,12 +1,8 @@
 package iav.takoe.echelon;
 
-import com.google.common.collect.ImmutableList;
-
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -24,14 +20,6 @@ import java.util.stream.Stream;
 @ParametersAreNonnullByDefault
 interface Echelon<V> extends Iterable<Collection<V>> {
 
-    interface ScopeFunction<V> extends Supplier<Collection<V>> {
-        @SafeVarargs
-        static <V> ScopeFunction<V> sequence(V... values) {
-            List<V> list = ImmutableList.copyOf(values);
-            return () -> list;
-        }
-    }
-
     /**
      * Create child echelon, which will be a new tail.
      * Each echelon can have only one child, so if this method
@@ -42,7 +30,7 @@ interface Echelon<V> extends Iterable<Collection<V>> {
      *                       each time it is reset.
      * @return The child echelon, which is the new tail.
      */
-    Echelon<V> createNext(ScopeFunction<V> scopeGenerator);
+    Echelon<V> createNext(Range<V> scopeGenerator);
 
     /**
      * @return Current value of this particular element.

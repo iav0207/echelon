@@ -1,6 +1,5 @@
 package iav.takoe.echelon;
 
-import iav.takoe.echelon.Echelon.ScopeFunction;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,7 @@ class CountingEchelonTest {
 
     private static final Logger log = getLogger(CountingEchelonTest.class);
 
-    private static final ScopeFunction<Integer> SCOPE = ScopeFunction.sequence(0, 1);
+    private static final Range<Integer> SCOPE = Range.fixed(0, 1);
     private static final int CHAIN_LENGTH = 4;
     private static final int TARGET_VALUES_COUNT = 2;
 

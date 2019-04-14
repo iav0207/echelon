@@ -1,6 +1,6 @@
 package iav.takoe.echelon;
 
-import iav.takoe.echelon.Echelon.ScopeFunction;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class EchelonBuilder<V> {
 
@@ -12,34 +12,31 @@ public class EchelonBuilder<V> {
     }
 
     public static <V> InitialStep<V> constrained(GlobalConstraint<V> constraint) {
-        return scopeFunction -> new EchelonBuilder<>(new ConstrainedEchelon<>(constraint, scopeFunction));
+        return range -> new EchelonBuilder<>(new ConstrainedEchelon<>(constraint, range));
     }
 
     public static <V> InitialStep<V> regular() {
-        return scopeFunction -> new EchelonBuilder<>(new RegularEchelon<>(scopeFunction));
+        return range -> new EchelonBuilder<>(new RegularEchelon<>(range));
     }
 
     public interface InitialStep<V> {
-        EchelonBuilder<V> createFirst(ScopeFunction<V> scopeFunction);
+        EchelonBuilder<V> createFirst(Range<V> range);
 
-        default EchelonBuilder<V> createBatch(int count, ScopeFunction<V> scopeFunction) {
-            return createFirst(scopeFunction).createSuccessors(count - 1, scopeFunction);
+        default EchelonBuilder<V> createBatch(int count, Range<V> range) {
+            return createFirst(range).createSuccessors(count - 1, range);
         }
     }
 
-    public EchelonBuilder<V> createSuccessors(int count, ScopeFunction<V> scopeFunction) {
+    public EchelonBuilder<V> createSuccessors(int count, Range<V> range) {
+        checkArgument(count > 0);
         for (int i = 0; i < count; i++) {
-            createNext(scopeFunction);
+            createNext(range);
         }
         return this;
     }
 
-    public EchelonBuilder<V> createNext(V... values) {
-        return createNext(ScopeFunction.sequence(values));
-    }
-
-    public EchelonBuilder<V> createNext(ScopeFunction<V> scopeGenerator) {
-        tail = tail.createNext(scopeGenerator);
+    public EchelonBuilder<V> createNext(Range<V> range) {
+        tail = tail.createNext(range);
         return this;
     }
 

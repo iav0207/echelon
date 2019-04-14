@@ -17,14 +17,14 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 @ParametersAreNonnullByDefault
 class RegularEchelon<V> implements Echelon<V> {
 
-    final ScopeFunction<V> scopeFunction;
+    final Range<V> range;
 
     V value;
     RegularEchelon<V> next;
     Queue<V> scope;
 
-    RegularEchelon(ScopeFunction<V> scopeFunction) {
-        this.scopeFunction = scopeFunction;
+    RegularEchelon(Range<V> range) {
+        this.range = range;
         renew();
     }
 
@@ -34,7 +34,7 @@ class RegularEchelon<V> implements Echelon<V> {
     }
 
     @Override
-    public RegularEchelon<V> createNext(ScopeFunction<V> scopeGenerator) {
+    public RegularEchelon<V> createNext(Range<V> scopeGenerator) {
         return setNext(new RegularEchelon<>(scopeGenerator));
     }
 
@@ -67,7 +67,7 @@ class RegularEchelon<V> implements Echelon<V> {
     }
 
     void renew() {
-        scope = new ArrayDeque<>(scopeFunction.get());
+        scope = new ArrayDeque<>(range.get());
         switchLocalValue();
         if (next != null) {
             next.renew();
