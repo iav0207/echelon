@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -23,24 +24,27 @@ class RegularEchelonTest {
     private static final Integer[] SCOPE = new Integer[] {0, 1};
     private static final int CHAIN_LENGTH = 4;
 
-    private Echelon<Integer> head;
     private List<Collection<Integer>> result;
-    private List<String> resultStrings;
 
     @BeforeEach
     void init() {
-        initWithNoGlobalTarget();
-        getResultAsStrings();
+        result = EchelonBuilder.<Integer>regular()
+                .createBatch(CHAIN_LENGTH, ScopeFunction.sequence(SCOPE))
+                .getHead()
+                .stream()
+                .collect(toList());
+
+        result.stream().map(this::asString).forEach(log::info);
     }
 
     @Test
     void shouldBeOfExpectedLength() {
-        assertThat(resultStrings.size()).isEqualTo((int) Math.pow(SCOPE.length, CHAIN_LENGTH));
+        assertThat(result).hasSize((int) Math.pow(SCOPE.length, CHAIN_LENGTH));
     }
 
     @Test
     void shouldContainDistinctValueSetsOnly() {
-        assertThat(resultStrings.size()).isEqualTo(resultStrings.stream().distinct().count());
+        assertThat(result).hasSameSizeAs(new HashSet<>(result));
     }
 
     @Test
@@ -49,20 +53,6 @@ class RegularEchelonTest {
         List<List<Integer>> allScopes = Stream.generate(() -> scopeAsList).limit(CHAIN_LENGTH).collect(toList());
 
         assertThat(result).isEqualTo(Lists.cartesianProduct(allScopes));
-    }
-
-    private void initWithNoGlobalTarget() {
-        head = EchelonBuilder.<Integer>regular()
-                .createBatch(CHAIN_LENGTH, ScopeFunction.sequence(SCOPE))
-                .getHead();
-    }
-
-    private void getResultAsStrings() {
-        result = head.stream().collect(toList());
-        resultStrings = result.stream()
-                .map(this::asString)
-                .peek(log::info)
-                .collect(toList());
     }
 
     private String asString(Collection<Integer> values) {
