@@ -16,19 +16,16 @@ class CountingEchelonTest {
 
     private static final Logger log = getLogger(CountingEchelonTest.class);
 
-    private static final Range<Integer> SCOPE = Range.fixed(0, 1);
     private static final int CHAIN_LENGTH = 4;
-    private static final int TARGET_VALUES_COUNT = 2;
+    private static final int NON_ZEROS_COUNT = 2;
+    private final Range<Integer> range = Range.fixed(0, 1);
 
-    private final ValueCountingConstraint<Integer> nonZeroValuesExactCountConstraint =
-            new ValueCountingConstraint<>(values -> values.size() - values.count(0) == TARGET_VALUES_COUNT);
-
-    private List<Collection<Integer>> result;
+    private List<List<Integer>> result;
 
     @BeforeEach
     void init() {
-        result = EchelonBuilder.constrained(nonZeroValuesExactCountConstraint)
-                .createBatch(CHAIN_LENGTH, SCOPE)
+        result = EchelonBuilder.<Integer>countingValues(values -> values.size() - values.count(0) == NON_ZEROS_COUNT)
+                .createBatch(CHAIN_LENGTH, range)
                 .getHead()
                 .stream()
                 .collect(toList());
@@ -38,12 +35,12 @@ class CountingEchelonTest {
 
     @Test
     void eachValueSetShouldBeOfFixedLength() {
-        result.forEach(each -> assertThat(each.size()).isEqualTo(CHAIN_LENGTH));
+        result.forEach(each -> assertThat(each).hasSize(CHAIN_LENGTH));
     }
 
     @Test
     void shouldContainExpectedNumberOfTargetValues() {
-        result.forEach(each -> assertThat(each.size()).isEqualTo(TARGET_VALUES_COUNT));
+        result.forEach(each -> assertThat(each.stream().filter(n -> n != 0)).hasSize(NON_ZEROS_COUNT));
     }
 
     private String asString(Collection<Integer> values) {

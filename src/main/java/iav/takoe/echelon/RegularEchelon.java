@@ -17,7 +17,7 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 @ParametersAreNonnullByDefault
 class RegularEchelon<V> implements Echelon<V> {
 
-    final Range<V> rangeFactory;
+    private final Range<V> rangeFactory;
 
     private V value;
     private RegularEchelon<V> next;
@@ -127,7 +127,6 @@ class RegularEchelon<V> implements Echelon<V> {
         }
 
         @Override
-        @SuppressWarnings("squid:S2272")
         public List<V> next() {
             if (theNext == null && !hasNext()) {
                 throw new NoSuchElementException();

@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.apache.log4j.Logger.getLogger;
@@ -20,15 +19,15 @@ class RegularEchelonTest {
 
     private static final Logger log = getLogger(RegularEchelonTest.class);
 
-    private static final Integer[] SCOPE = new Integer[] {0, 1};
+    private static final Range<Integer> RANGE = Range.fixed(0, 1);
     private static final int CHAIN_LENGTH = 4;
 
-    private List<Collection<Integer>> result;
+    private List<List<Integer>> result;
 
     @BeforeEach
     void init() {
         result = EchelonBuilder.<Integer>regular()
-                .createBatch(CHAIN_LENGTH, Range.fixed(SCOPE))
+                .createBatch(CHAIN_LENGTH, RANGE)
                 .getHead()
                 .stream()
                 .collect(toList());
@@ -38,7 +37,7 @@ class RegularEchelonTest {
 
     @Test
     void shouldBeOfExpectedLength() {
-        assertThat(result).hasSize((int) Math.pow(SCOPE.length, CHAIN_LENGTH));
+        assertThat(result).hasSize((int) Math.pow(RANGE.get().size(), CHAIN_LENGTH));
     }
 
     @Test
@@ -48,7 +47,7 @@ class RegularEchelonTest {
 
     @Test
     void finalResultShouldBeIdenticalToCartesianProductIfScopesAreConstantSequences() {
-        List<Integer> scopeAsList = asList(SCOPE);
+        List<Integer> scopeAsList = RANGE.get();
         List<List<Integer>> allScopes = Stream.generate(() -> scopeAsList).limit(CHAIN_LENGTH).collect(toList());
 
         assertThat(result).isEqualTo(Lists.cartesianProduct(allScopes));

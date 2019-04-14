@@ -5,11 +5,11 @@ import com.google.common.collect.Multiset;
 
 import java.util.function.Predicate;
 
-public class ValueCountingConstraint<V> extends ValuesTrackingConstraint<V> {
+public class ValuesCountingConstraint<V> extends ValuesTrackingConstraint<V> {
     private final Multiset<V> counter = HashMultiset.create();
     private final Predicate<Multiset<V>> condition;
 
-    public ValueCountingConstraint(Predicate<Multiset<V>> fulfillmentCondition) {
+    public ValuesCountingConstraint(Predicate<Multiset<V>> fulfillmentCondition) {
         this.condition = fulfillmentCondition;
     }
 
