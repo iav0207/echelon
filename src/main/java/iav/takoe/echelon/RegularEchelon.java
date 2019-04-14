@@ -51,7 +51,6 @@ class RegularEchelon<V> implements Echelon<V> {
         return next.canSwitch() || canSwitchLocal();
     }
 
-    @SuppressWarnings("SimplifiableIfStatement")
     boolean canSwitchLocal() {
         return !scope.isEmpty();
     }
