@@ -3,8 +3,8 @@ package iav.takoe.echelon;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Spliterator;
@@ -17,14 +17,14 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 @ParametersAreNonnullByDefault
 class RegularEchelon<V> implements Echelon<V> {
 
-    final Range<V> range;
+    final Range<V> rangeFactory;
 
-    V value;
-    RegularEchelon<V> next;
-    Queue<V> scope;
+    private V value;
+    private RegularEchelon<V> next;
+    private Queue<V> range;
 
-    RegularEchelon(Range<V> range) {
-        this.range = range;
+    RegularEchelon(Range<V> rangeFactory) {
+        this.rangeFactory = rangeFactory;
         renew();
     }
 
@@ -34,8 +34,8 @@ class RegularEchelon<V> implements Echelon<V> {
     }
 
     @Override
-    public RegularEchelon<V> createNext(Range<V> scopeGenerator) {
-        return setNext(new RegularEchelon<>(scopeGenerator));
+    public RegularEchelon<V> createNext(Range<V> rangeFactory) {
+        return setNext(new RegularEchelon<>(rangeFactory));
     }
 
     RegularEchelon<V> setNext(RegularEchelon<V> newEchelon) {
@@ -51,8 +51,8 @@ class RegularEchelon<V> implements Echelon<V> {
         return next.canSwitch() || canSwitchLocal();
     }
 
-    boolean canSwitchLocal() {
-        return !scope.isEmpty();
+    private boolean canSwitchLocal() {
+        return !range.isEmpty();
     }
 
     void switchValue() {
@@ -66,8 +66,8 @@ class RegularEchelon<V> implements Echelon<V> {
         }
     }
 
-    void renew() {
-        scope = new ArrayDeque<>(range.get());
+    private void renew() {
+        range = new ArrayDeque<>(rangeFactory.get());
         switchLocalValue();
         if (next != null) {
             next.renew();
@@ -75,36 +75,35 @@ class RegularEchelon<V> implements Echelon<V> {
     }
 
     void switchLocalValue() {
-        checkState(canSwitchLocal(), "attempt to switch value when none left in the scope");
-        value = scope.remove();
+        checkState(canSwitchLocal(), "attempt to switch value when none left in the range");
+        value = range.remove();
     }
 
     @Override
-    public Iterator<Collection<V>> iterator() {
+    public Iterator<List<V>> iterator() {
         return new RegularEchelonIterator();
     }
 
     @Override
-    public Stream<Collection<V>> stream() {
+    public Stream<List<V>> stream() {
         int characteristics = Spliterator.ORDERED | Spliterator.NONNULL;
         boolean parallel = false;
         return StreamSupport.stream(spliteratorUnknownSize(iterator(), characteristics), parallel);
     }
 
-    @SuppressWarnings("squid:S3398")
-    Collection<V> getValues() {
+    List<V> getValues() {
         return addValues(new ArrayList<>());
     }
 
-    Collection<V> addValues(Collection<V> values) {
+    private List<V> addValues(List<V> values) {
         values.add(value);
         return next == null ? values : next.addValues(values);
     }
 
-    class RegularEchelonIterator implements Iterator<Collection<V>> {
+    class RegularEchelonIterator implements Iterator<List<V>> {
 
-        Collection<V> lastReturned = null;
-        Collection<V> theNext = null;
+        List<V> lastReturned = null;
+        List<V> theNext = null;
 
         @Override
         public boolean hasNext() {
@@ -120,7 +119,7 @@ class RegularEchelon<V> implements Echelon<V> {
                 theNext = getValues();
                 switchValue();
             } else {
-                Collection<V> values = getValues();
+                List<V> values = getValues();
                 if (lastReturned != null && !values.equals(lastReturned)) {
                     theNext = values;
                 }
@@ -129,11 +128,11 @@ class RegularEchelon<V> implements Echelon<V> {
 
         @Override
         @SuppressWarnings("squid:S2272")
-        public Collection<V> next() {
+        public List<V> next() {
             if (theNext == null && !hasNext()) {
                 throw new NoSuchElementException();
             }
-            Collection<V> result = lastReturned = theNext;
+            List<V> result = lastReturned = theNext;
             theNext = null;
             return result;
         }

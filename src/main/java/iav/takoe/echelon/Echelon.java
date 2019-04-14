@@ -1,8 +1,8 @@
 package iav.takoe.echelon;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -18,19 +18,19 @@ import java.util.stream.Stream;
  * @param <V> type of values
  */
 @ParametersAreNonnullByDefault
-interface Echelon<V> extends Iterable<Collection<V>> {
+interface Echelon<V> extends Iterable<List<V>> {
 
     /**
      * Create child echelon, which will be a new tail.
      * Each echelon can have only one child, so if this method
      * is called twice on the same instance an exception will be thrown.
      *
-     * @param scopeGenerator supplier defining a dependency and providing
-     *                       the new child with its values scope
-     *                       each time it is reset.
+     * @param rangeFactory supplier defining a dependency and providing
+     *                     the new child with its values range
+     *                     each time it is reset.
      * @return The child echelon, which is the new tail.
      */
-    Echelon<V> createNext(Range<V> scopeGenerator);
+    Echelon<V> createNext(Range<V> rangeFactory);
 
     /**
      * @return Current value of this particular element.
@@ -38,8 +38,8 @@ interface Echelon<V> extends Iterable<Collection<V>> {
     V getValue();
 
     @Override
-    Iterator<Collection<V>> iterator();
+    Iterator<List<V>> iterator();
 
-    Stream<Collection<V>> stream();
+    Stream<List<V>> stream();
 
 }

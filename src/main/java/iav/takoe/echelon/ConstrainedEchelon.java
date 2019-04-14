@@ -1,8 +1,8 @@
 package iav.takoe.echelon;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 class ConstrainedEchelon<V> extends RegularEchelon<V> {
@@ -16,8 +16,8 @@ class ConstrainedEchelon<V> extends RegularEchelon<V> {
     }
 
     @Override
-    public RegularEchelon<V> createNext(Range<V> scopeGenerator) {
-        return setNext(new ConstrainedEchelon<>(constraint, scopeGenerator));
+    public RegularEchelon<V> createNext(Range<V> rangeFactory) {
+        return setNext(new ConstrainedEchelon<>(constraint, rangeFactory));
     }
 
     @Override
@@ -36,7 +36,7 @@ class ConstrainedEchelon<V> extends RegularEchelon<V> {
     }
 
     @Override
-    public Iterator<Collection<V>> iterator() {
+    public Iterator<List<V>> iterator() {
         return new ConstrainedIterator();
     }
 
